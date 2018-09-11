@@ -2,8 +2,6 @@ package main
 
 import (
     "log"
-    "database/sql"
-    _ "github.com/go-sql-driver/mysql"
     "flag"
     "fmt"
     "time"
@@ -13,16 +11,27 @@ import (
 func main() {
     flag.Parse()
 
-    db,err := sql.Open("mysql", "Config().Username:Config().Password@tcp(Config().Host:Config().Port)/Config().Dbname?charset-utf8")
-    if err != nil {
-        log.Println("connect error:",err)
-    }
-    var user string
-    db.QueryRow("select username from user limit 1").Scan(&user)
+    rows, err := db.Query("select username from user limit 3")
+    defer rows.Close()
     if err != nil {
         log.Println("exec error:",err)
     }
-    log.Println("result:",user)
+    columns, _ := rows.Columns()
+    scanArgs := make([]interface{}, len(columns))
+    values := make([]interface{}, len(columns))
+    for j := range values {
+        scanArgs[j] = &values[j]
+    }
+    record := make(map[string]string)
+    for rows.Next() {
+        err = rows.Scan(scanArgs...)
+        for i, col := range values {
+            if col != nil {
+                record[columns[i]] = string(col.([]byte))
+            }
+        }
+    }
+    fmt.Println(record)
 
     c := pool.Get()
     defer c.Close()
