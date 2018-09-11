@@ -11,7 +11,7 @@ import (
 func main() {
     flag.Parse()
 
-    rows, err := db.Query("select username from user limit 3")
+    rows, err := db.Query("select * from user limit 3")
     defer rows.Close()
     if err != nil {
         log.Println("exec error:",err)
@@ -30,8 +30,8 @@ func main() {
                 record[columns[i]] = string(col.([]byte))
             }
         }
+        fmt.Println(record)
     }
-    fmt.Println(record)
 
     c := pool.Get()
     defer c.Close()
