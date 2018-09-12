@@ -1,4 +1,4 @@
-package redis
+package redisModel
 
 import (
     "github.com/garyburd/redigo/redis"
@@ -32,6 +32,6 @@ func newPool(addr, password string) *redis.Pool {
 
 var pool *redis.Pool
 
-func init() {
-    pool = newPool(Config().Redis.Server, Config().Redis.Password)
+func InitRedis(addr, password string) {
+    pool = newPool(addr, password)
 }

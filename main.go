@@ -6,15 +6,21 @@ import (
     "fmt"
     "time"
     "github.com/garyburd/redigo/redis"
-    "redis/model"
+    "goscript/config"
+    "goscript/model"
+    "goscript/redisModel"
 )
 
 func main() {
     flag.Parse()
 
-    model.initDB();
+    configs := config.Config()
+    db := configs.Database
 
-    rows, err := db.Query("select * from user limit 3")
+    model.InitDB(db.Host, db.Port, db.Dbname, db.Username, db.Password)
+    redisModel.InitRedis(configs.Redis.Server, configs.Redis.Password)
+
+    rows, err := model.db.Query("select * from user limit 3")
     defer rows.Close()
     if err != nil {
         log.Println("exec error:",err)
@@ -36,7 +42,7 @@ func main() {
         fmt.Println(record)
     }
 
-    c := pool.Get()
+    c := redisModel.pool.Get()
     defer c.Close()
 
     _, err = c.Do("SET", "username", "nick")
