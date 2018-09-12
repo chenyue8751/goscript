@@ -79,7 +79,7 @@ func deleteMulti(keys []string) int {
             j = len
         }
         chunk = keys[i:j]
-        count += conn.Do("DEL", chunk)
+        count += conn.Do("DEL", chunk...)
     }
     return count
 }
