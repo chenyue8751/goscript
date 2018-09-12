@@ -6,10 +6,13 @@ import (
     "fmt"
     "time"
     "github.com/garyburd/redigo/redis"
+    "redis/model"
 )
 
 func main() {
     flag.Parse()
+
+    model.initDB();
 
     rows, err := db.Query("select * from user limit 3")
     defer rows.Close()
