@@ -31,7 +31,7 @@ var (
 
 func Config() *tomlConfig {
     once.Do(func () {
-        filePath := "./config.toml"
+        filePath := "./config/config.toml"
         if _, err := toml.DecodeFile(filePath, &cfg); err != nil {
             panic(err)
         }

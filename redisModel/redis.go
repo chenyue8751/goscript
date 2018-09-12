@@ -32,6 +32,7 @@ func newPool(addr, password string) *redis.Pool {
 
 var pool *redis.Pool
 
-func InitRedis(addr, password string) {
+func InitRedis(addr, password string) *redis.Pool {
     pool = newPool(addr, password)
+    return pool
 }

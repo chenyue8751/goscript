@@ -1,10 +1,8 @@
 package main
 
 import (
-    "log"
     "flag"
     "fmt"
-    "time"
     "github.com/garyburd/redigo/redis"
     "goscript/config"
     "goscript/model"
@@ -18,34 +16,16 @@ func main() {
     db := configs.Database
 
     model.InitDB(db.Host, db.Port, db.Dbname, db.Username, db.Password)
-    redisModel.InitRedis(configs.Redis.Server, configs.Redis.Password)
+    pool := redisModel.InitRedis(configs.Redis.Server, configs.Redis.Password)
 
-    rows, err := model.db.Query("select * from user limit 3")
-    defer rows.Close()
-    if err != nil {
-        log.Println("exec error:",err)
-    }
-    columns, _ := rows.Columns()
-    scanArgs := make([]interface{}, len(columns))
-    values := make([]interface{}, len(columns))
-    for j := range values {
-        scanArgs[j] = &values[j]
-    }
-    record := make(map[string]string)
-    for rows.Next() {
-        err = rows.Scan(scanArgs...)
-        for i, col := range values {
-            if col != nil {
-                record[columns[i]] = string(col.([]byte))
-            }
-        }
-        fmt.Println(record)
-    }
+    sql := "select * from user limit 3"
+    record := model.Finds(sql)
+    fmt.Println(record)
 
-    c := redisModel.pool.Get()
+    c := pool.Get()
     defer c.Close()
 
-    _, err = c.Do("SET", "username", "nick")
+    _, err := c.Do("SET", "username", "nick", "EX", "60")
     if err != nil {
         fmt.Println("redis set failed:", err)
     }
@@ -55,18 +35,5 @@ func main() {
         fmt.Println("redis get failed:", err)
     } else {
         fmt.Printf("Got username %v \n", username)
-    }
-
-    _, err = c.Do("SET", "password", "123456", "EX", "2")
-    if err != nil {
-        fmt.Println("redis set failed:", err)
-    }
-
-    time.Sleep(3 * time.Second)
-    password, err := redis.String(c.Do("GET", "password"))
-    if err != nil {
-        fmt.Println("redis get failed:", err)
-    } else {
-        fmt.Printf("Got password %v \n", password)
     }
 }
