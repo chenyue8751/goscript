@@ -9,7 +9,8 @@ func CleanBattle() {
     lastMonday := lastMonday(time.Now()).Format("2006-01-02")
     keyPattern := "minigame:battlePlayer:" + lastMonday + ":*"
     keys := getKeys(keyPattern)
-    fmt.Println(keys)
+    count := deleteMulti(keys)
+    fmt.Println(count)
 }
 
 func lastMonday(now time.Time) time.Time {

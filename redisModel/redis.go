@@ -67,6 +67,23 @@ func getKeys(pattern string) []string {
     return result
 }
 
+func deleteMulti(keys []string) int {
+    conn = pool.Get()
+    defer conn.Close()
+
+    len := len(keys)
+    var chunk []string
+    count := 0
+    for i, j := 0, 1000; i< len; i, j = i + 1000, j + 1000 {
+        if j > len {
+            j = len
+        }
+        chunk = keys[i:j]
+        count += conn.Do("DEL", chunk)
+    }
+    return count
+}
+
 func mergeSlice(s1 []string, s2 []string) []string {
     slice := make([]string, len(s1)+len(s2))
     copy(slice, s1)
