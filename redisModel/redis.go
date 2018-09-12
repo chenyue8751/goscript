@@ -30,9 +30,46 @@ func newPool(addr, password string) *redis.Pool {
     }
 }
 
-var pool *redis.Pool
+var (
+    pool *redis.Pool
+    conn redis.Conn
+)
 
 func InitRedis(addr, password string) *redis.Pool {
     pool = newPool(addr, password)
     return pool
+}
+
+func getKeys(pattern string) []string {
+    conn = pool.Get()
+    defer conn.Close()
+
+    iter := 0
+
+    result := make([]string, 0)
+    var keys []string
+    for {
+        if arr, err := redis.MultiBulk(conn.Do("SCAN", iter, "MATCH", pattern, "COUNT", 10000)); err != nil {
+            panic(err)
+        } else {
+            iter, _ = redis.Int(arr[0], nil)
+            keys, _ = redis.Strings(arr[1], nil)
+        }
+        if keys != nil {
+            result = mergeSlice(result, keys)
+        }
+
+        if iter == 0 {
+            break
+        }
+    }
+
+    return result
+}
+
+func mergeSlice(s1 []string, s2 []string) []string {
+    slice := make([]string, len(s1)+len(s2))
+    copy(slice, s1)
+    copy(slice[len(s1):], s2)
+    return slice
 }

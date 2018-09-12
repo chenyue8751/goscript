@@ -18,6 +18,8 @@ func main() {
     model.InitDB(db.Host, db.Port, db.Dbname, db.Username, db.Password)
     pool := redisModel.InitRedis(configs.Redis.Server, configs.Redis.Password)
 
+    redisModel.CleanBattle()
+
     sql := "select * from user limit 3"
     record := model.Finds(sql)
     fmt.Println(record)
