@@ -5,9 +5,9 @@ environment = "devlopment"
 [database]
 host = "127.0.0.1"
 port = 3306
-dbname = "docker"
-username = "docker"
-password = "docker"
+dbname = "minigame"
+username = "root"
+password = "root"
 
 [redis]
 server = "127.0.0.1:6379"
