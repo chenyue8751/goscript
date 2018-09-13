@@ -17,7 +17,8 @@ func main() {
     model.InitDB(db.Host, db.Port, db.Dbname, db.Username, db.Password)
     redisModel.InitRedis(configs.Redis.Server, configs.Redis.Password)
 
-    redisModel.CleanBattle()
+    count, _ := redisModel.CleanBattle()
+    fmt.Println("delete keys, nums: ", count)
 
     sql := "select * from user limit 3"
     record := model.Finds(sql)
