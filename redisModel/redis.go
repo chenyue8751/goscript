@@ -68,18 +68,29 @@ func getKeys(pattern string) []string {
 }
 
 func deleteMulti(keys []string) int {
+    len := len(keys)
+    if len == 0 {
+        return 0
+    }
+
     conn = pool.Get()
     defer conn.Close()
 
-    len := len(keys)
-    var chunk []string
     count := 0
     for i, j := 0, 1000; i< len; i, j = i + 1000, j + 1000 {
         if j > len {
             j = len
         }
-        chunk = keys[i:j]
-        count += conn.Do("DEL", chunk...)
+        for _, value := range keys[i:j] {
+            conn.Send("DEL", value)
+        }
+        conn.Flush()
+        for _, _ = range keys[i:j] {
+            result, err := redis.Int(conn.Receive())
+            if err == nil {
+                count += result
+            }
+        }
     }
     return count
 }
