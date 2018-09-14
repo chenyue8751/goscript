@@ -19,8 +19,8 @@ func BattlePlays() []*BattlePlay {
     }
 
     result := make([]*BattlePlay, 0)
-    record := new(BattlePlay)
     for rows.Next() {
+        record := new(BattlePlay)
         err = rows.Scan(&record.UserId, &record.Score, &record.GameId)
         if err == nil {
             result = append(result, record)
