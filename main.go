@@ -41,4 +41,19 @@ func recoverData() map[int]map[int]map[int]int {
 		data[item.UserId][item.GameId][item.Score]++
 	}
 	return data
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }

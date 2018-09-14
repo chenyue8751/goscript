@@ -11,6 +11,7 @@ type BattlePlay struct {
 }
 
 func BattlePlays() []*BattlePlay {
+    data = 
     sql := "SELECT user_id, score, game_id FROM battle_player left join battle on battle.id = battle_player.battle_id;"
     rows, err := db.Query(sql)
     defer rows.Close()
