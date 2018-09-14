@@ -24,11 +24,11 @@ func main() {
 }
 
 func recoverData() map[int]map[int]map[int]int {
-    sql := "SELECT user_id, score, game_id, battle.create_at FROM battle_player left join battle on battle.id = battle_player.battle_id;"
-    record := model.Finds(sql)
+    record := model.BattlePlays()
     data := make(map[int]map[int]map[int]int)
     for _, item  := range record {
-        data[item["user_id"]][item["game_id"]][item["score"]]++
+        fmt.Printf("%#v", item.UserId)
+        data[item.UserId][item.GameId][item.Score]++
     }
     return data
 }
