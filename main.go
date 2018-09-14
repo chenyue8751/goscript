@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+    "os"
 	"goscript/config"
 	"goscript/internal"
 	"goscript/model"
@@ -10,16 +11,46 @@ import (
 	"time"
 )
 
+var (
+    h bool
+    command string
+)
+
+func init() {
+    flag.BoolVar(&h, "h", false, "this script's usage")
+	flag.StringVar(&command, "command", "", "set command: clean_battle,recover_battle")
+    flag.Usage = Usage
+}
+
 func main() {
-	var command string
-	flag.StringVar(&command, "command", "clean_battle", "choose on command.eg: help,clean_battle,recover_battle")
 	flag.Parse()
+
+    if h {
+        flag.Usage()
+    }
 
 	configs := config.Config()
 	db := configs.Database
 	model.InitDB(db.Host, db.Port, db.Dbname, db.Username, db.Password)
 	redisModel.InitRedis(configs.Redis.Server, configs.Redis.Password)
 
+    switch command {
+    case "clean_battle":
+        cleanBattle()
+    case "recover_battle":
+        recoverBattle()
+    default:
+        flag.Usage()
+    }
+}
+
+func Usage() {
+    fmt.Fprintf(os.Stderr, `Minigame system script
+Version: v1.0
+Usage: goscript [-h] [-command=clean_battle]
+Options:
+`)
+    flag.PrintDefaults()
 }
 
 func cleanBattle() {
