@@ -10,9 +10,8 @@ type BattlePlay struct {
     Score int
 }
 
-func BattlePlays() []*BattlePlay {
-    data = 
-    sql := "SELECT user_id, score, game_id FROM battle_player left join battle on battle.id = battle_player.battle_id;"
+func BattlePlays(date string) []*BattlePlay {
+    sql := "SELECT user_id, score, game_id FROM battle_player LEFT JOIN battle ON battle.id = battle_player.battle_id WHERE battle.create_at >= '" + date + "'"
     rows, err := db.Query(sql)
     defer rows.Close()
     if err != nil {

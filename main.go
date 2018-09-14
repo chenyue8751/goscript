@@ -3,9 +3,11 @@ package main
 import (
 	"flag"
 	"fmt"
+    "time"
 	"goscript/config"
 	"goscript/model"
 	"goscript/redisModel"
+    "goscript/internal"
 )
 
 func main() {
@@ -23,8 +25,9 @@ func main() {
 	fmt.Println(data)
 }
 
-func recoverData() map[int]map[int]map[int]int {
-	record := model.BattlePlays()
+func recoverData() bool {
+    date := internal.ThisMonday(time.Now()).Format("2006-01-02")
+	record := model.BattlePlays(date)
 	data := make(map[int]map[int]map[int]int)
 	for _, item := range record {
 		user, ok := data[item.UserId]
@@ -40,20 +43,8 @@ func recoverData() map[int]map[int]map[int]int {
 
 		data[item.UserId][item.GameId][item.Score]++
 	}
-	return data
+	
+    redisModel.InitBattle(data, date)
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    return true
 }
