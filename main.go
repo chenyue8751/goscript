@@ -14,11 +14,13 @@ import (
 var (
     h bool
     command string
+    date string
 )
 
 func init() {
     flag.BoolVar(&h, "h", false, "this script's usage")
 	flag.StringVar(&command, "command", "", "set command: clean_battle,recover_battle")
+    flag.StringVar(&date, "date", "", "simulate date: 2000-01-01")
     flag.Usage = Usage
 }
 
@@ -36,9 +38,9 @@ func main() {
 
     switch command {
     case "clean_battle":
-        cleanBattle()
+        cleanBattle(date)
     case "recover_battle":
-        recoverBattle()
+        recoverBattle(date)
     default:
         flag.Usage()
     }
@@ -53,13 +55,26 @@ Options:
     flag.PrintDefaults()
 }
 
-func cleanBattle() {
-	count, _ := redisModel.CleanBattle()
+func cleanBattle(handleDate string) {
+    var now time.Time
+    if handleDate == "" {
+        now = time.Now()
+    } else {
+        now, _ = time.Parse("2006-01-02", handleDate)
+    }
+	lastMonday := internal.LastMonday(now).Format("2006-01-02")
+	count, _ := redisModel.CleanBattle(lastMonday)
 	fmt.Println("delete keys, nums: ", count)
 }
 
-func recoverBattle() bool {
-	date := internal.ThisMonday(time.Now()).Format("2006-01-02")
+func recoverBattle(handleDate string) bool {
+    var now time.Time
+    if handleDate == "" {
+        now = time.Now()
+    } else {
+        now, _ = time.Parse(time.RFC3339, handleDate)
+    }
+	date := internal.ThisMonday(now).Format("2006-01-02")
 	record := model.BattlePlays(date)
 	data := make(map[int]map[int]map[int]int)
 	for _, item := range record {
