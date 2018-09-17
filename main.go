@@ -13,12 +13,14 @@ import (
 
 var (
 	h       bool
+    configFilePath string
 	command string
 	date    string
 )
 
 func init() {
 	flag.BoolVar(&h, "h", false, "this script's usage")
+    flag.StringVar(&configFilePath, "config-file-path", "./config/config.toml", "config file path")
 	flag.StringVar(&command, "command", "", "set command: clean_battle,recover_battle")
 	flag.StringVar(&date, "date", "", "simulate date: 2000-01-01")
 	flag.Usage = Usage
@@ -31,7 +33,7 @@ func main() {
 		flag.Usage()
 	}
 
-	configs := config.Config()
+	configs := config.Config(configFilePath)
 	db := configs.Database
 	model.InitDB(db.Host, db.Port, db.Dbname, db.Username, db.Password)
 	redisModel.InitRedis(configs.Redis.Server, configs.Redis.Password)

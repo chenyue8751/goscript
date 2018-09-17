@@ -1,0 +1,14 @@
+# This is a TOML document
+
+environment = "devlopment"
+
+[database]
+host = "127.0.0.1"
+port = 3306
+dbname = "minigame"
+username = "root"
+password = "root"
+
+[redis]
+server = "127.0.0.1:6379"
+password = ""

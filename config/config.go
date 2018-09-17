@@ -3,6 +3,10 @@ package config
 import (
     "github.com/BurntSushi/toml"
     "sync"
+    "path/filepath"
+    "os"
+    "os/exec"
+    "strings"
 )
 
 type tomlConfig struct {
@@ -29,12 +33,19 @@ var (
     once sync.Once
 )
 
-func Config() *tomlConfig {
+func Config(configFilePath string) *tomlConfig {
     once.Do(func () {
-        filePath := "./config/config.toml"
-        if _, err := toml.DecodeFile(filePath, &cfg); err != nil {
+        if _, err := toml.DecodeFile(configFilePath, &cfg); err != nil {
             panic(err)
         }
     })
     return cfg
+}
+
+func getAppPath() string {
+    file, _ := exec.LookPath(os.Args[0])
+    path, _ := filepath.Abs(file)
+    index := strings.LastIndex(path, string(os.PathSeparator))
+
+    return path[:index]
 }
